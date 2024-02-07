@@ -4,9 +4,11 @@ import { DirectivesService } from './directives.service';
 import { DirectivesController } from './directives.controller';
 
 import { Directive } from './entities/directive.entity';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Directive])],
+  imports: [TypeOrmModule.forFeature([Directive]), AuthModule, UsersModule],
   controllers: [DirectivesController],
   providers: [DirectivesService],
 })

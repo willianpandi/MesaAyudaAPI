@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { ROLES, ETNIA, M_LABORAL, NOMBRAMIENTO, SEXO, N_INTRUCCION, R_LABORAL } from "src/constants/opcions";
-import { EstableishmentDto } from "src/estableishments/dto/estableishment.dto";
+import { IsBoolean, IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { ROLES, ETNIA, M_LABORAL, NOMBRAMIENTO, SEXO, N_INTRUCCION, R_LABORAL } from "../../constants/opcions";
+import { Estableishment } from "../../estableishments/entities/estableishment.entity";
 
 
 export class UserDto {
@@ -17,8 +17,8 @@ export class UserDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    @IsEnum(ROLES)
-    rol: ROLES;
+    @IsBoolean()
+    estado: boolean;
 
     @ApiProperty()
     @IsNotEmpty()
@@ -27,136 +27,13 @@ export class UserDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    estableishment: EstableishmentDto; 
-}
-
-export class ProfileDto {
-// PERFILES
-    // @ApiProperty()
-    // // @IsNotEmpty()
-    // @IsString()
-    // cedula: string;
-
-    // @ApiProperty()
-    // // @IsNotEmpty()
-    // @IsOptional()
-    // @IsString()
-    // nombre: string;
-
-    // @ApiProperty()
-    // // @IsNotEmpty()
-    // @IsOptional()
-    // @IsEnum(SEXO)
-    // sexo: SEXO;
-
-    // @ApiProperty()
-    // // @IsOptional()
-    // @IsNotEmpty()
-    // @IsString()
-    // nivel_institucional: string;
-
-    // @ApiProperty()
-    // // @IsNotEmpty()
-    // @IsOptional()
-    // @IsString()
-    // itinerancia: string;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsString()
-    // profesion: string;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsEnum(ETNIA)
-    // etnia: ETNIA; 
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsDate()
-    // fecha_nacimiento: Date;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsNumber()
-    // telefono: string;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsString()
-    // direccion: string;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsEmail()
-    // correo_institucional: string;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsEmail()
-    // correo_personal: string;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsString()
-    // regimen_laboral: string;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsEnum(M_LABORAL)
-    // modalidad_laboral: M_LABORAL;
-    
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsEnum(NOMBRAMIENTO)
-    // nombramiento: NOMBRAMIENTO;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsString()
-    // area_laboral: string;
-
-    // @ApiProperty()
-    // @IsNotEmpty()
-    // @IsDate()
-    // fecha_ingreso: Date;
-
-}
-
-export class RegisterUserDto {
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    usuario: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    contrasenia: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    nombre: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    estableishment: EstableishmentDto; 
-
+    estableishment: Estableishment;
 }
 
 
-export class LoginDto {
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    usuario: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    contrasenia: string;
-}
+
+
 
 export class UpdateUserDto {
     @ApiProperty()
@@ -173,6 +50,12 @@ export class UpdateUserDto {
     @IsOptional()
     @IsEnum(ROLES)
     rol: ROLES;
+    
+    
+    @ApiProperty()
+    @IsOptional()
+    @IsBoolean()
+    estado: boolean;
 
     @ApiProperty()
     @IsOptional()
@@ -211,8 +94,8 @@ export class UpdateUserDto {
 
     @ApiProperty()
     @IsOptional()
-    @IsNumber()
-    telefono: number;
+    @IsString()
+    telefono: string;
 
     @ApiProperty()
     @IsOptional()
@@ -254,4 +137,21 @@ export class UpdateUserDto {
     @IsDate()
     fecha_ingreso: Date;
 
+    @ApiProperty()
+    @IsOptional()
+    @IsNotEmpty()
+    estableishment: Estableishment;
+ }
+
+
+ export class UpdateUserPassword {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    contrasenia: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    newContrasenia: string;
  }

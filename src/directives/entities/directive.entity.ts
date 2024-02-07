@@ -1,6 +1,7 @@
-import { BaseEntity } from "src/config/base.entity";
-import { Ticket } from "src/tickets/entities/ticket.entity";
-import { Column, Entity, OneToMany } from "typeorm";
+import { BaseEntity } from "../../config/base.entity";
+import { Ticket } from "../../tickets/entities/ticket.entity";
+import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { User } from '../../users/entities/user.entity';
 
 @Entity({name: 'directives'})
 export class Directive extends BaseEntity {
@@ -12,10 +13,27 @@ export class Directive extends BaseEntity {
     descripcion: string;
 
     @Column()
-    rango_tiempo: string;
+    rango_tiempo: string;  
 
 
     // RELACION
     @OneToMany(()=> Ticket, (tickets)=> tickets.directive )
     tickets: Ticket[];
+
+    //Nombre de quien crea el dato
+    // @ManyToOne(() => User)
+    // @JoinColumn({ name: 'usuarioEmail', referencedColumnName: 'correo_institucional'})
+    // user: User;
+
+    // @Column({nullable: true})
+    // usuarioEmail: string;
+
+    // @BeforeInsert()
+    // upload(){
+    //     this.nombre = this.nombre.toLowerCase().trim();
+    // }
+    // @BeforeUpdate()
+    // uploads(){
+    //     this.upload();
+    // }
 }

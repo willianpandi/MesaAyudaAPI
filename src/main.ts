@@ -1,25 +1,31 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
 import * as morgan from "morgan";
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common';
 import { CORS } from './constants/cors';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(morgan('dev'))
+  const logger = new Logger('Bootstrap');
+  // app.use(morgan('dev'));
   app.useGlobalPipes( 
     new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
       transformOptions: {
         enableImplicitConversion: true,
       },
     })
   );
 
-  app.enableCors();
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors( new ClassSerializerInterceptor(reflector))
+
+  app.enableCors(CORS);
   app.setGlobalPrefix('api');
   
+  // DOCUMENTACION POR SWAGGER
   const config = new DocumentBuilder()
     .setTitle('Mesa de Ayuda API')
     .setDescription('Aplicacion de menejo de gestion de tareas y tickets')
@@ -29,11 +35,7 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
   
 
-  const configService = app.get(ConfigService);
-
-
-
-  await app.listen(configService.get('PORT'));
-  console.log(`Aplicacion corriendo en: ${await app.getUrl()}`);
+  await app.listen( process.env.PORT );
+  logger.log(`App corriendo en el puerto: ${ process.env.PORT }`);
 }
 bootstrap();

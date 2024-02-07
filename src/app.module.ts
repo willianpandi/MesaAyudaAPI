@@ -7,22 +7,23 @@ import { TicketsModule } from './tickets/tickets.module';
 import { DirectivesModule } from './directives/directives.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SarveyModule } from './sarvey/sarvey.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `.${process.env.NODE_ENV}.env`,
       isGlobal: true,
     }),
+    
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 5432,
+      database: 'ejemplo_1',
       username: 'postgres',
       password: '150820',
-      database: 'ejemplo_1',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      autoLoadEntities: true,
+      // entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     UsersModule, 
@@ -30,6 +31,7 @@ import { SarveyModule } from './sarvey/sarvey.module';
     DistrictsModule, 
     TicketsModule, 
     DirectivesModule, 
-    SarveyModule],
+    AuthModule, 
+  ],
 })
 export class AppModule { }

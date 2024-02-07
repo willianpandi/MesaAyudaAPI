@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { DistrictDto } from "src/districts/dto/district.dto";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class EstableishmentDto {
     @ApiProperty()

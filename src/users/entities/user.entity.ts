@@ -1,12 +1,11 @@
 
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
-import { N_INTRUCCION, ROLES, R_LABORAL } from 'src/constants/opcions';
-import { ETNIA, M_LABORAL, NOMBRAMIENTO, SEXO } from "src/constants/opcions";
-import { BaseEntity } from "src/config/base.entity";
-import { Estableishment } from "src/estableishments/entities/estableishment.entity";
+import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { N_INTRUCCION, ROLES, R_LABORAL, ETNIA, M_LABORAL, NOMBRAMIENTO, SEXO } from '../../constants/opcions';
+import { BaseEntity } from "../../config/base.entity";
+import { Estableishment } from "../../estableishments/entities/estableishment.entity";
+// import { Exclude } from 'class-transformer';
 
-// import { Profile } from "src/profiles/entities/profile.entity";
-import { Ticket } from "src/tickets/entities/ticket.entity";
+import { Ticket } from "../../tickets/entities/ticket.entity";
 
 @Entity({name: 'users'})
 export class User extends BaseEntity{
@@ -17,14 +16,13 @@ export class User extends BaseEntity{
     @Column()
     contrasenia: string;
 
-    @Column({ type: 'enum', enum: ROLES, nullable: true })
+    @Column({ type: 'enum', enum: ROLES, default: ROLES.USUARIO})
     rol: ROLES;
 
     @Column({ default: true})
     estado: boolean;
 
-
-    @Column({nullable: true})
+    @Column({ type: 'text', nullable: true })
     nombre: string;
 
     @Column({ type: 'enum', enum: SEXO, nullable: true})
@@ -46,7 +44,7 @@ export class User extends BaseEntity{
     fecha_nacimiento: Date;
 
     @Column({nullable: true})
-    telefono: number;
+    telefono: string;
 
     @Column({nullable: true})
     direccion: string;
@@ -72,11 +70,6 @@ export class User extends BaseEntity{
     @Column({ type: 'date' , nullable: true})
     fecha_ingreso: Date;
 
-    // RELACIONES
-    // @OneToOne(()=>  Profile)
-    // @JoinColumn({name: 'id_profile'})
-    // profile: Profile;
-
     @ManyToOne(()=> Estableishment, (estableishment)=> estableishment.user )
     @JoinColumn({name: 'id_estableishment'})
     estableishment: Estableishment;
@@ -84,4 +77,21 @@ export class User extends BaseEntity{
     @OneToMany(()=> Ticket, (tickets)=> tickets.user )
     tickets: Ticket[];
 
+    // Relación con los tickets asignados al usuario de soporte
+    @OneToMany(() => Ticket, (ticket) => ticket.soporteUser)
+    soporteTickets: Ticket[];
+
+    // @BeforeInsert()
+    // async upperCampos(): Promise<any>{
+    //     console.log('Método checkFileBeforeInsert ejecutado');
+    //     this.nombre = this.nombre.toLowerCase();
+    // }
+
+    // @BeforeUpdate()
+    // async campos(): Promise<any>{
+    //     console.log('Método checkFileBeforeInsert ejecutado');
+    //     this.nombre = this.nombre.toLowerCase();
+    // }
 }
+
+

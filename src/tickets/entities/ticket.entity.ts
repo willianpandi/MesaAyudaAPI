@@ -1,17 +1,23 @@
-import { BaseEntity } from "src/config/base.entity";
-import { ESTADOS } from "src/constants/opcions";
-import { Directive } from "src/directives/entities/directive.entity";
-import { Sarvey } from "src/sarvey/entities/sarvey.entity";
-import { User } from "src/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
+import { Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { BaseEntity } from "../../config/base.entity";
+import { ESTADOS, SATISFACCION } from "../../constants/opcions";
+import { Directive } from "../../directives/entities/directive.entity";
+import { User } from "../../users/entities/user.entity";
+import { File } from "./file.entity";
+import { TicketDetalle } from "./tickDetalle.entity";
+
 
 @Entity({name: 'tickets'})
 export class Ticket extends BaseEntity {
     @Column()
-    descripcion: string;
+    @Generated('increment')
+    codigo: number;
 
-    @Column({type: 'bytea', nullable: true})
-    archivo: Buffer;
+    @Column()
+    titulo: string;
+
+    @Column()
+    descripcion: string;
 
     @Column()
     area: string;
@@ -25,21 +31,33 @@ export class Ticket extends BaseEntity {
     @Column()
     n_consultorio: string;
 
-    @Column({type: 'enum', enum: ESTADOS})
+    @Column({type: 'enum', enum: ESTADOS, default: ESTADOS.ABIERTO})
     estado: ESTADOS;
+
+    @Column({ type: 'enum', enum: SATISFACCION, nullable: true })
+    satisfaccion: SATISFACCION;
+
+    @Column({nullable: true})
+    sugerencias: string;
 
     // RELACION
 
-    @ManyToOne(()=> Directive, (directiv)=> directiv.tickets)
+    @ManyToOne(()=> Directive, (directive)=> directive.tickets)
     @JoinColumn({name: 'id_directive'})
     directive: Directive;
     
-    @ManyToOne(()=> User, (user)=> user.tickets)
+    @ManyToOne(()=> User, (user)=> user.tickets, { eager: true })
     @JoinColumn({name: 'id_user'})
-    user: User[];
+    user: User;
 
-    @OneToOne(()=> Sarvey)
-    @JoinColumn({name: 'id_sarvey'})
-    sarvey: Sarvey;
+    @ManyToOne(() => User, (soportUser) => soportUser.soporteTickets, { eager: true, nullable: true })
+    @JoinColumn({ name: 'id_user_soporte' })
+    soporteUser: User; // Relación con el usuario de soporte
+
+    @OneToMany(()=> File, (files) => files.ticket, { cascade:true, eager: true, } )
+    files?: File[];
+
+    @OneToMany(() => TicketDetalle, (ticketdetalle) => ticketdetalle.ticket, { cascade: true, eager: true })
+    ticketdetalle?: TicketDetalle[];
 
 }

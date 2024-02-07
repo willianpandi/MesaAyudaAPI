@@ -4,13 +4,14 @@ import { EstableishmentsService } from './estableishments.service';
 import { EstableishmentsController } from './estableishments.controller';
 
 import { Estableishment } from './entities/estableishment.entity';
-import { DistrictsService } from 'src/districts/districts.service';
-import { District } from 'src/districts/entities/district.entity';
-import { DistrictsModule } from 'src/districts/districts.module';
+import { District } from '../districts/entities/district.entity';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Estableishment, District])],
+  imports: [TypeOrmModule.forFeature([Estableishment, District]), AuthModule, UsersModule],
   controllers: [EstableishmentsController],
-  providers: [EstableishmentsService, DistrictsService],
+  providers: [EstableishmentsService],
+  exports: [EstableishmentsService, TypeOrmModule]
 })
 export class EstableishmentsModule {}

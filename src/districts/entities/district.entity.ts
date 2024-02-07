@@ -1,6 +1,6 @@
-import { BaseEntity } from "src/config/base.entity";
-import { PROVINCIAS } from "src/constants/opcions";
-import { Estableishment } from "src/estableishments/entities/estableishment.entity";
+import { BaseEntity } from "../../config/base.entity";
+import { PROVINCIAS } from "../../constants/opcions";
+import { Estableishment } from "../../estableishments/entities/estableishment.entity";
 import { Column, Entity, OneToMany } from "typeorm";
 
 @Entity({name: 'districts'})

@@ -1,6 +1,6 @@
-import { BaseEntity } from "src/config/base.entity";
-import { District } from "src/districts/entities/district.entity";
-import { User } from "src/users/entities/user.entity";
+import { BaseEntity } from "../../config/base.entity";
+import { District } from "../../districts/entities/district.entity";
+import { User } from "../../users/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 
 @Entity({name: 'estableishments'})
