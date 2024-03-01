@@ -9,6 +9,7 @@ import { Repository, UpdateResult } from 'typeorm';
 import { DistrictDto, UpdateDistrictDto } from './dto/district.dto';
 import { District } from './entities/district.entity';
 import { Estableishment } from '../estableishments/entities/estableishment.entity';
+import { ESTADOS, OPORTUNO, SATISFACCION, S_PROBLEMA } from 'src/constants/opcions';
 
 
 @Injectable()
@@ -69,6 +70,117 @@ export class DistrictsService {
       throw new NotFoundException('El distrito no fue encontrado');
     }
     return district.estableishments;
+  }
+
+  async findTicketsByEODReports(idDistrito: string, mesFiltro?: number, anioFiltro?: number): Promise<any[]> {
+    const distrito = await this.districtRepository.findOne({
+      where: { id: idDistrito },
+      relations: ['estableishments', 'estableishments.tickets', 'estableishments.tickets.subcategory', 'estableishments.tickets.estableishment'],
+    });
+  
+    if (!distrito) {
+      throw new NotFoundException('No se encontró la EOD');
+    }
+  
+    const tickets = distrito.estableishments.flatMap(establecimiento =>
+      establecimiento.tickets.filter(ticket => {
+        if (mesFiltro && anioFiltro) {
+          const fechaCreacion = new Date(ticket.createdAt);
+          return fechaCreacion.getMonth() === mesFiltro - 1 && fechaCreacion.getFullYear() === Number(anioFiltro);
+        }
+        return true;
+      })
+    );
+      console.log(tickets);
+      
+
+    const establecimientosConTickets = tickets.reduce((result, ticket) => {
+      const establecimiento = ticket.estableishment;
+      
+      if (!result[establecimiento.id]) {
+        result[establecimiento.id] = {
+          nombre: establecimiento.nombre,
+          totalTickets: 0,
+          ticketsAbiertos: 0,
+          ticketsEnProceso: 0,
+          ticketsCerrados: 0,
+          ticketsNS: 0,
+          ticketsAS: 0,
+          ticketsS: 0,
+          ticketsMS: 0,
+          ticketsATiempo: 0,
+          ticketsAtrasados: 0,
+          ticketsOportuno: 0,
+          ticketsNoOportuno: 0,
+          ticketsSolucionado: 0,
+          ticketsNoSolucionado: 0,
+        };
+      }
+  
+      result[establecimiento.id].totalTickets++;
+      if (ticket.estado === ESTADOS.ABIERTO) {
+        result[establecimiento.id].ticketsAbiertos++;
+      } else if (ticket.estado === ESTADOS.EN_PROCESO) {
+        result[establecimiento.id].ticketsEnProceso++;
+      } else if (ticket.estado === ESTADOS.CERRADO) {
+        result[establecimiento.id].ticketsCerrados++;
+        const tiempoOcupado = ticket.tiempoOcupado;
+        const tiempoSubcategoria = ticket.subcategory.tiempo;
+
+        if (tiempoSubcategoria - tiempoOcupado >= 0) {
+          result[establecimiento.id].ticketsATiempo++;
+        } else {
+          result[establecimiento.id].ticketsAtrasados++;
+        }
+      }
+      switch (ticket.satisfaccion) {
+        case SATISFACCION.N_S:
+          result[establecimiento.id].ticketsNS++;
+          break;
+        case SATISFACCION.P_S:
+          result[establecimiento.id].ticketsAS++;
+          break;
+        case SATISFACCION.S:
+          result[establecimiento.id].ticketsS++;
+          break;
+        case SATISFACCION.M_S:
+          result[establecimiento.id].ticketsMS++;
+          break;
+      }
+      switch (ticket.a_oportuna) {
+        case OPORTUNO.SI:
+          result[establecimiento.id].ticketsOportuno++;
+          break;
+        case OPORTUNO.NO:
+          result[establecimiento.id].ticketsNoOportuno++;
+          break;
+      }
+      switch (ticket.s_problema) {
+        case S_PROBLEMA.SI:
+          result[establecimiento.id].ticketsSolucionado++;
+          break;
+        case S_PROBLEMA.NO:
+          result[establecimiento.id].ticketsNoSolucionado++;
+          break;
+      }
+
+      return result;
+    }, {});
+  
+    console.log(establecimientosConTickets);
+    
+    const totalRow = Object.values(establecimientosConTickets).reduce((acc, curr) => {
+      Object.keys(curr).forEach(key => {
+        if (key !== 'nombre') {
+          acc[key] = (acc[key] || 0) + curr[key];
+        }
+      });
+      return acc;
+    }, { nombre: 'TOTAL' });
+  
+    const resultArray = [...Object.values(establecimientosConTickets), totalRow];
+  
+    return resultArray;
   }
 
   async updateDistrict(

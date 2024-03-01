@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -39,6 +39,13 @@ export class DistrictsController {
   async findAllByDistrict(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.districtsService.findEstableishmentByDistrict(id);
   }
+
+  @Get('reports/:id')
+  @Auth(ROLES.ADMINISTRADOR)
+  async findTicketsReports( @Param('id', new ParseUUIDPipe()) id: string, @Query('mes') mes: number, @Query('anio') anio: number) {
+    return this.districtsService.findTicketsByEODReports(id, mes, anio);
+  }
+
 
   @Patch('edit/:id')
   @Auth(ROLES.ADMINISTRADOR)
