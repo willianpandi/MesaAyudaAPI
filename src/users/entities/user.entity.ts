@@ -1,97 +1,151 @@
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+} from 'typeorm';
+import {
+  ROLES,
+} from '../../constants/opcions';
+import { BaseEntity } from '../../config/base.entity';
+import { Estableishment } from '../../estableishments/entities/estableishment.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
-import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
-import { N_INTRUCCION, ROLES, R_LABORAL, ETNIA, M_LABORAL, NOMBRAMIENTO, SEXO } from '../../constants/opcions';
-import { BaseEntity } from "../../config/base.entity";
-import { Estableishment } from "../../estableishments/entities/estableishment.entity";
-// import { Exclude } from 'class-transformer';
+@Entity({ name: 'users' })
+export class User extends BaseEntity {
+  @ApiProperty({
+    example: '1808888888',
+    description: 'Usuario / # de cedula',
+    uniqueItems: true,
+  })
+  @Column({ unique: true })
+  usuario: string;
 
-import { Ticket } from "../../tickets/entities/ticket.entity";
+  @ApiProperty({
+    example: '123456',
+    description: 'Contraseña de usuario',
+  })
+  @Column()
+  contrasenia: string;
 
-@Entity({name: 'users'})
-export class User extends BaseEntity{
-    
-    @Column({unique: true})
-    usuario: string;
+  @ApiProperty({
+    example: 'SOPORTE',
+    description: 'Rol de usuario',
+  })
+  @Column({ type: 'enum', enum: ROLES })
+  rol: ROLES;
 
-    @Column()
-    contrasenia: string;
+  @ApiProperty({
+    example: 'true',
+    description: 'Estado de la cuenta',
+    default: true,
+  })
+  @Column({ default: true })
+  estado: boolean;
 
-    @Column({ type: 'enum', enum: ROLES, default: ROLES.USUARIO})
-    rol: ROLES;
+  @ApiProperty({
+    example: 'Willian Pandi',
+    description: 'Nombre de usuario',
+  })
+  @Column({ type: 'text' })
+  nombre: string;
 
-    @Column({ default: true})
-    estado: boolean;
+  @ApiProperty({
+    example: 'Analista de Soporte Tecnico',
+    description: 'Denominacion del puesto',
+  })
+  @Column({ type: 'text',})
+  puesto: string;
 
-    @Column({ type: 'text', nullable: true })
-    nombre: string;
+  @ApiProperty({
+    example: 'SP1',
+    description: 'Grupo Ocupacional del Usuario',
+  })
+  @Column({ type: 'text'})
+  g_Ocupacional: string;
+  
+  @ApiProperty({
+    example: 'DEFINITIVO',
+    description: 'Modalidad de contrato del Usuario',
+  })
+  @Column({ type: 'text'})
+  m_contrato: string;
+  
+  @ApiProperty({
+    example: '15/08/2023',
+    description: 'Fecha de Ingreso del Usuario',
+  })
+  @Column({type: 'date'})
+  f_ingreso: Date;
 
-    @Column({ type: 'enum', enum: SEXO, nullable: true})
-    sexo: SEXO;
+  @ApiProperty({
+    example: '098888888',
+    description: '# telefono del usuario',
+  })
+  @Column()
+  celular: string;
 
-    @Column({type: 'enum', enum: N_INTRUCCION, nullable: true})
-    nivel_institucional: N_INTRUCCION;
+  @ApiProperty({
+    example: '098888888',
+    description: '# telefono del usuario',
+  })
+  @Column({ nullable:true })
+  telefono: string;
 
-    @Column({nullable: true})
-    itinerancia: string;
+  @ApiProperty({
+    example: 'ejemplo@coordinacion.com',
+    description: 'Correo electrónico institucional del usuario',
+    uniqueItems: true,
+  })
+  @Column({ unique: true })
+  correo_institucional: string;
+  
+  @ApiProperty({
+    example: 'ejemplo@gmail.com',
+    description: 'Correo electrónico personal del usuario',
+    uniqueItems: true,
+  })
+  @Column({ unique: true })
+  correo_personal: string;
 
-    @Column({nullable: true})
-    profesion: string;
+  @ApiProperty({
+    example: 'Administrativo',
+    description: 'Cambio Administrativo',
+  })
+  @Column({ nullable: true })
+  c_Administrativo: string;
+  
+  @ApiProperty({
+    example: 'Soporte Tecnico',
+    description: 'Funciones Adicionales del Usuario',
+  })
+  @Column({ nullable: true })
+  funciones_A: string;
+  
+  @ApiProperty({
+    example: 'Soporte Tecnico',
+    description: 'Funciones Adicionales del Usuario',
+  })
+  @Column({ nullable: true })
+  observaciones: string;
 
-    @Column({ type: 'enum', enum: ETNIA, nullable: true})
-    etnia: ETNIA; 
 
-    @Column({ type: 'date', nullable: true })
-    fecha_nacimiento: Date;
+  // @OneToMany(() => Category, (categories) => categories.user, {onDelete: 'CASCADE'})
+  // categories: Category[];
 
-    @Column({nullable: true})
-    telefono: string;
+  @ApiProperty({
+    example: '["Datos de Establecimiento"]',
+    description: 'Establecimientos a los que pertenece el usuario',
+  })
+  @ManyToMany( () => Estableishment, (estableishment) => estableishment.users,  { cascade:true, eager: true, } )
+  estableishments: Estableishment[];
+  
+  @ApiProperty({
+    example: '["Datos de Temas de Ayuda"]',
+    description: 'Establecimientos a los que pertenece el usuario',
+  })
+  @ManyToMany(() => Category, (categories) => categories.users, {cascade:true, eager: true,})
+  categories: Category[];
 
-    @Column({nullable: true})
-    direccion: string;
-
-    @Column({unique: true, nullable: true})
-    correo_institucional: string;
-
-    @Column({unique: true, nullable: true})
-    correo_personal: string;
-
-    @Column({type: 'enum', enum: R_LABORAL, nullable: true})
-    regimen_laboral: R_LABORAL;
-
-    @Column({ type: 'enum', enum: M_LABORAL, nullable: true })
-    modalidad_laboral: M_LABORAL;
-    
-    @Column({ type: 'enum', enum: NOMBRAMIENTO, nullable: true })
-    nombramiento: NOMBRAMIENTO;
-
-    @Column( {nullable: true})
-    area_laboral: string;
-
-    @Column({ type: 'date' , nullable: true})
-    fecha_ingreso: Date;
-
-    @ManyToOne(()=> Estableishment, (estableishment)=> estableishment.user )
-    @JoinColumn({name: 'id_estableishment'})
-    estableishment: Estableishment;
-
-    @OneToMany(()=> Ticket, (tickets)=> tickets.user )
-    tickets: Ticket[];
-
-    // Relación con los tickets asignados al usuario de soporte
-    @OneToMany(() => Ticket, (ticket) => ticket.soporteUser)
-    soporteTickets: Ticket[];
-
-    // @BeforeInsert()
-    // async upperCampos(): Promise<any>{
-    //     console.log('Método checkFileBeforeInsert ejecutado');
-    //     this.nombre = this.nombre.toLowerCase();
-    // }
-
-    // @BeforeUpdate()
-    // async campos(): Promise<any>{
-    //     console.log('Método checkFileBeforeInsert ejecutado');
-    //     this.nombre = this.nombre.toLowerCase();
-    // }
 }
-
-

@@ -5,17 +5,21 @@ import { UsersController } from './users.controller';
 
 import { User } from './entities/user.entity';
 import { Estableishment } from '../estableishments/entities/estableishment.entity';
-import { Ticket } from '../tickets/entities/ticket.entity';
+import { EstableishmentsService } from '../estableishments/estableishments.service';
+import { DistrictsService } from '../districts/districts.service';
 import { District } from '../districts/entities/district.entity';
+import { CategoriesService } from '../categories/categories.service';
+import { Category } from '../categories/entities/category.entity';
+import { SubCategoryService } from 'src/sub-category/sub-category.service';
+import { SubCategory } from 'src/sub-category/entities/sub-category.entity';
 
 
 @Module({
   imports: [
-    // AuthModule,
-    TypeOrmModule.forFeature([User, Estableishment, Ticket, District]),    
+    TypeOrmModule.forFeature([User, Estableishment, District, Category, SubCategory])  
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, EstableishmentsService, DistrictsService, CategoriesService, SubCategoryService],
   exports: [UsersService, TypeOrmModule],
 })
 export class UsersModule {}

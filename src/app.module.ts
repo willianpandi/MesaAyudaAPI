@@ -4,10 +4,11 @@ import { UsersModule } from './users/users.module';
 import { EstableishmentsModule } from './estableishments/estableishments.module';
 import { DistrictsModule } from './districts/districts.module';
 import { TicketsModule } from './tickets/tickets.module';
-import { DirectivesModule } from './directives/directives.module';
+import { CategoriesModule } from './categories/categories.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { SubCategoryModule } from './sub-category/sub-category.module';
 
 @Module({
   imports: [
@@ -19,19 +20,18 @@ import { AuthModule } from './auth/auth.module';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      database: 'ejemplo_1',
+      database: 'mesa_ayuda',
       username: 'postgres',
       password: '150820',
       autoLoadEntities: true,
-      // entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     UsersModule, 
     EstableishmentsModule, 
     DistrictsModule, 
     TicketsModule, 
-    DirectivesModule, 
-    AuthModule, 
+    CategoriesModule, 
+    AuthModule, SubCategoryModule, 
   ],
 })
 export class AppModule { }

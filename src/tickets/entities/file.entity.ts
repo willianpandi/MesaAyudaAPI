@@ -8,7 +8,7 @@ export class File extends BaseEntity {
     @Column()
     archivo: string;
 
-    @ManyToOne(() => Ticket, (ticket) => ticket.files, {onDelete: 'CASCADE'})
+    @ManyToOne(() => Ticket, (ticket) => ticket.files, { onDelete: 'CASCADE'})
     @JoinColumn({name: 'id_tickets'})
     ticket: Ticket;
 }

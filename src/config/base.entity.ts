@@ -14,5 +14,5 @@ export abstract class BaseEntity {
         type: 'timestamp',
         name: 'updated_at'
     })
-    apdateAt: Date;
+    updateAt: Date;
 }

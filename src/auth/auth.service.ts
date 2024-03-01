@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload';
 
 import { User } from '../users/entities/user.entity';
-import { LoginDto, RegisterUserDto } from './dto/create-auth.dto';
+import { LoginDto } from './dto/create-auth.dto';
 import { LoginResponse } from './interfaces/login-response';
 
 @Injectable()
@@ -27,18 +27,17 @@ export class AuthService {
       where: {
         usuario,
       },
-      relations: ['estableishment', 'estableishment.district'],
     });
 
     if (!user) {
       throw new BadRequestException(
-        'Credenciales no válidas, usuario incorrecto',
+        'Usuario incorrecto.',
       );
     }
 
     if (!bcryptjs.compareSync(contrasenia, user.contrasenia)) {
       throw new BadRequestException(
-        'Credenciales no válidas, contraseña incorrecta',
+        'Contraseña incorrecta.',
       );
     }
 
@@ -51,30 +50,6 @@ export class AuthService {
     return {
       token: this.getJwtToken({ id: user.id }),
       user,
-    };
-  }
-
-  async register(body: RegisterUserDto) {
-    const userFound = await this.userRepository.findOneBy({
-      usuario: body.usuario,
-    });
-
-    if (userFound) {
-      throw new BadRequestException(
-        'Ya existe un usuario con el número de usuario',
-      );
-    }
-
-    const { contrasenia, ...userDta } = body;
-    const newUser = await this.userRepository.create({
-      contrasenia: bcryptjs.hashSync(contrasenia, 10),
-      ...userDta,
-    });
-
-    const user = await this.userRepository.save(newUser);
-
-    return {
-      user: user,
     };
   }
 

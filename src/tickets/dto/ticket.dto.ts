@@ -1,29 +1,41 @@
-import { ESTADOS } from './../../constants/opcions';
+import { ESTADOS, OPORTUNO, SATISFACCION, S_PROBLEMA } from './../../constants/opcions';
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsEnum, IsNotEmpty, IsOptional, IsString, } from "class-validator";
-import { Directive } from '../../directives/entities/directive.entity';
+import { IsBoolean, IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, } from "class-validator";
+import { Category } from '../../categories/entities/category.entity';
 import { File } from '../entities/file.entity';
 
 
 export class TicketDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    cedula: string;
 
     @ApiProperty()
     @IsNotEmpty()
-    directive: Directive;
+    @IsString()
+    nombre: string;
 
     @ApiProperty()
     @IsNotEmpty()
-    soporteUser: string;
+    @IsString()
+    @IsEmail()
+    correo_electronico: string;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    telefono: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
     @IsString()
     descripcion: string;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
-    titulo: string;
+    requerimiento: string;
 
     @ApiProperty()
     @IsNotEmpty()
@@ -49,67 +61,82 @@ export class TicketDto {
     @IsOptional()
     @IsEnum(ESTADOS)
     estado?: ESTADOS;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    category: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    subcategory: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    estableishment: string;
     
     @ApiProperty()
     @IsOptional()
     files?: File[];
 
+    @ApiProperty()
+    @IsOptional()
+    @IsEnum(SATISFACCION)
+    satisfaccion?: SATISFACCION;
+    
+    @ApiProperty()
+    @IsOptional()
+    @IsEnum(OPORTUNO)
+    a_oportuna?: OPORTUNO;
+    
+    @ApiProperty()
+    @IsOptional()
+    @IsEnum(S_PROBLEMA)
+    s_problema?: S_PROBLEMA;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    sugerencias?: string;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    soporteReasignado?: string;
+    
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    soporteAsignado?: string;
+    
+    @ApiProperty()
+    @IsOptional()
+    @IsDate()
+    reasignadoAt?: Date;
+    
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    soportePresente?: string;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsNumber()
+    tiempoOcupado?: number;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsNumber()
+    tiempoReasignado?: number;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    soporteComentario?: string;
+
 }
 
 
 export class UpdateTicketDto extends PartialType(TicketDto){}
-
-export class TicketDetalleDto {
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    detalle: string;
-}
-
-// export class UpdateTicketDto {
-
-//     @ApiProperty()
-//     @IsNotEmpty()
-//     directive: Directive;
-
-
-//     @ApiProperty()
-//     @IsOptional()
-//     @IsString()
-//     descripcion: string;
-
-//     @ApiProperty()
-//     @IsOptional()
-//     @IsString()
-//     titulo: string;
-
-//     @ApiProperty()
-//     @IsNotEmpty()
-//     @IsString()
-//     area: string;
-
-//     @ApiProperty()
-//     @IsNotEmpty()
-//     @IsString()
-//     piso: string;
-
-//     @ApiProperty()
-//     @IsNotEmpty()
-//     @IsString()
-//     n_sala: string;
-
-//     @ApiProperty()
-//     @IsNotEmpty()
-//     @IsString()
-//     n_consultorio: string;
-
-//     @ApiProperty()
-//     @IsOptional()
-//     @IsEnum(ESTADOS)
-//     estado?: ESTADOS;
-    
-//     @ApiProperty()
-//     @IsOptional()
-//     files?: File[];
-
-// }

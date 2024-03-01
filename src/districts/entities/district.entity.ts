@@ -15,6 +15,6 @@ export class District extends BaseEntity {
     provincia: PROVINCIAS;
 
     // RELACIONES
-    @OneToMany(()=> Estableishment, (estableishments)=> estableishments.district)
+    @OneToMany(()=> Estableishment, (estableishments)=> estableishments.district,  { cascade:true, eager: true, } )
     estableishments: Estableishment[];
 }

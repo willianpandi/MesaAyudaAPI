@@ -28,7 +28,7 @@ async function bootstrap() {
   // DOCUMENTACION POR SWAGGER
   const config = new DocumentBuilder()
     .setTitle('Mesa de Ayuda API')
-    .setDescription('Aplicacion de menejo de gestion de tareas y tickets')
+    .setDescription('Mesa de Ayuda App endpoints')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

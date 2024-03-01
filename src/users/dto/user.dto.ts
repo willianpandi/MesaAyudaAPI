@@ -1,7 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { ROLES, ETNIA, M_LABORAL, NOMBRAMIENTO, SEXO, N_INTRUCCION, R_LABORAL } from "../../constants/opcions";
-import { Estableishment } from "../../estableishments/entities/estableishment.entity";
+import { ApiProperty, PartialType } from "@nestjs/swagger";
+import { IsBoolean, IsDate, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { ROLES } from "../../constants/opcions";
 
 
 export class UserDto {
@@ -17,80 +16,43 @@ export class UserDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    @IsBoolean()
-    estado: boolean;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    nombre: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    estableishment: Estableishment;
-}
-
-
-
-
-
-
-export class UpdateUserDto {
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    usuario: string;
-
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    contrasenia: string;
-
-    @ApiProperty()
-    @IsOptional()
     @IsEnum(ROLES)
     rol: ROLES;
-    
-    
+
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsBoolean()
     estado: boolean;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     nombre: string;
 
     @ApiProperty()
-    @IsOptional()
-    @IsEnum(SEXO)
-    sexo: SEXO;
-
-    @ApiProperty()
-    @IsOptional()
-    @IsEnum(N_INTRUCCION)
-    nivel_institucional: N_INTRUCCION;
-
-    @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
-    itinerancia: string;
+    puesto: string;
 
     @ApiProperty()
-    @IsOptional()
-    @IsString()
-    profesion: string;
-
-    @ApiProperty()
-    @IsOptional()
-    @IsEnum(ETNIA)
-    etnia: ETNIA; 
-
-    @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsDate()
-    fecha_nacimiento: Date;
+    f_ingreso: Date;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    g_Ocupacional: string;
+    
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    m_contrato: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    celular: string;
 
     @ApiProperty()
     @IsOptional()
@@ -98,50 +60,35 @@ export class UpdateUserDto {
     telefono: string;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
-    direccion: string;
-
-    @ApiProperty()
-    @IsOptional()
     @IsEmail()
     correo_institucional: string;
 
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
     @IsEmail()
     correo_personal: string;
 
     @ApiProperty()
     @IsOptional()
-    @IsEnum(R_LABORAL)
-    regimen_laboral: R_LABORAL;
-
-    @ApiProperty()
-    @IsOptional()
-    @IsEnum(M_LABORAL)
-    modalidad_laboral: M_LABORAL;
+    @IsString()
+    c_Administrativo: string;
     
     @ApiProperty()
     @IsOptional()
-    @IsEnum(NOMBRAMIENTO)
-    nombramiento: NOMBRAMIENTO;
-
+    @IsString()
+    funciones_A: string;
+    
     @ApiProperty()
     @IsOptional()
     @IsString()
-    area_laboral: string;
+    observaciones: string;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsDate()
-    fecha_ingreso: Date;
+}
 
-    @ApiProperty()
-    @IsOptional()
-    @IsNotEmpty()
-    estableishment: Estableishment;
- }
+export class UpdateUserDto extends PartialType(UserDto) {}
 
 
  export class UpdateUserPassword {
@@ -154,4 +101,18 @@ export class UpdateUserDto {
     @IsNotEmpty()
     @IsString()
     newContrasenia: string;
+ }
+
+ export class AddEstableishmentDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    estableishment: string;
+ }
+ 
+ export class AddCategoryDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    category: string;
  }

@@ -4,11 +4,10 @@ import { DistrictsService } from './districts.service';
 import { DistrictsController } from './districts.controller';
 
 import { District } from './entities/district.entity';
-import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([District]), AuthModule, UsersModule],
+  imports: [TypeOrmModule.forFeature([District]), UsersModule],
   controllers: [DistrictsController],
   providers: [DistrictsService],
   exports: [DistrictsService, TypeOrmModule]
