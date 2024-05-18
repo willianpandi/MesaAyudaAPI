@@ -1,6 +1,5 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-// import * as morgan from "morgan";
 import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common';
 import { CORS } from './constants/cors';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -16,7 +15,6 @@ async function bootstrap() {
   // const app = await NestFactory.create(AppModule, {httpsOptions});
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
-  // app.use(morgan('dev'));
   app.useGlobalPipes( 
     new ValidationPipe({
       whitelist: true,
