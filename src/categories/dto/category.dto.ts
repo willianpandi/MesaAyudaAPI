@@ -1,7 +1,13 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 export class CategoryDto {
+  
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsBoolean()
+  estado: boolean;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()

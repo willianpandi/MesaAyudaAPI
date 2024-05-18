@@ -12,7 +12,7 @@ import {
 } from './dto/estableishment.dto';
 import { Estableishment } from './entities/estableishment.entity';
 import { DistrictsService } from '../districts/districts.service';
-import { ESTADOS, OPORTUNO, SATISFACCION, S_PROBLEMA } from 'src/constants/opcions';
+import { ESTADOS, OPORTUNO, SATISFACCION, S_PROBLEMA } from '../constants/opcions';
 
 @Injectable()
 export class EstableishmentsService {
@@ -40,7 +40,7 @@ export class EstableishmentsService {
         'No existe el distrito ingresado',
       );
     }
-    return await this.estableishmentRepository.save({...body, district});
+    return await this.estableishmentRepository.save({...body, district, createdAt: new Date(),updateAt: new Date()});
   }
 
   async findAllEstableishments(): Promise<Estableishment[]> {
@@ -303,7 +303,7 @@ export class EstableishmentsService {
     }
 
     const estableishment: UpdateResult =
-      await this.estableishmentRepository.update(id, {...body, district});
+      await this.estableishmentRepository.update(id, {...body, district, updateAt: new Date()});
     if (estableishment.affected === 0) {
       throw new BadRequestException('No se pudo actualizar el establecimiento');
     }

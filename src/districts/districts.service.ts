@@ -9,7 +9,7 @@ import { Repository, UpdateResult } from 'typeorm';
 import { DistrictDto, UpdateDistrictDto } from './dto/district.dto';
 import { District } from './entities/district.entity';
 import { Estableishment } from '../estableishments/entities/estableishment.entity';
-import { ESTADOS, OPORTUNO, SATISFACCION, S_PROBLEMA } from 'src/constants/opcions';
+import { ESTADOS, OPORTUNO, SATISFACCION, S_PROBLEMA } from '../constants/opcions';
 
 
 @Injectable()
@@ -30,7 +30,7 @@ export class DistrictsService {
         'Ya existe el distrito con el código ingresado',
       );
     }
-    return this.districtRepository.save(body);
+    return this.districtRepository.save({...body, createdAt: new Date(),updateAt: new Date()});
   }
 
   async findAllDistricts(): Promise<District[]> {
@@ -51,7 +51,6 @@ export class DistrictsService {
       where: {
         id,
       },
-      // relations: ['estableishments'],
     });
     if (!district) {
       throw new NotFoundException('El distrito no fue encontrado');
@@ -61,9 +60,7 @@ export class DistrictsService {
 
   async findEstableishmentByDistrict(id: string): Promise<Estableishment[]> {
     const district: District = await this.districtRepository.findOne({
-      where: {
-        id,
-      },
+      where: {id},
       relations: ['estableishments'],
     });
     if (!district) {
@@ -90,9 +87,7 @@ export class DistrictsService {
         }
         return true;
       })
-    );
-      console.log(tickets);
-      
+    );      
 
     const establecimientosConTickets = tickets.reduce((result, ticket) => {
       const establecimiento = ticket.estableishment;
@@ -166,8 +161,6 @@ export class DistrictsService {
 
       return result;
     }, {});
-  
-    console.log(establecimientosConTickets);
     
     const totalRow = Object.values(establecimientosConTickets).reduce((acc, curr) => {
       Object.keys(curr).forEach(key => {
@@ -197,7 +190,7 @@ export class DistrictsService {
     }
     const district: UpdateResult = await this.districtRepository.update(
       id,
-      body,
+      {...body,updateAt: new Date()}
     );
     if (district.affected === 0) {
       throw new BadRequestException('No se pudo actualizar el distrito');

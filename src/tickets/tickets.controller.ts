@@ -6,7 +6,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   ParseUUIDPipe,
   UseInterceptors,
   UploadedFile,
@@ -83,6 +82,14 @@ export class TicketsController {
     const newTicketsAsig = tickets.filter(ticket => ticket.estado === ESTADOS.ABIERTO || ticket.estado === ESTADOS.EN_PROCESO);
     return newTicketsAsig;
   }
+  
+  @Get('reasig-close-tickets')
+  @Auth(ROLES.SOPORTE)
+  async findTicketsAsigClose(@GetUser() user: User) {
+    const tickets = await this.ticketsService.findAllTicketsAsig(user);
+    const closeTicketsAsig = tickets.filter(ticket => ticket.estado === ESTADOS.CERRADO);
+    return closeTicketsAsig;
+  }
  
   @Get('reports')
   @Auth(ROLES.ADMINISTRADOR)
@@ -90,7 +97,6 @@ export class TicketsController {
       return await this.ticketsService.findAllTicketsReasig(mes, anio);
   }
 
-  //CONTADOR
   @Get('count')
   async getCount() {
     return await this.ticketsService.Count();
@@ -148,14 +154,7 @@ export class TicketsController {
     return await this.ticketsService.updateReasigTicket(id, body);
   }
 
-  @Delete('delete/:id')
-  @Auth(ROLES.ADMINISTRADOR)
-  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return await this.ticketsService.removeTicket(id);
-  }
-
-
-  //CONTROLADORES PARA SUBIR ARCHIVOS
+  // SUBIR ARCHIVOS
 
   @Get('file/:fileName')
   findFile(@Res() res: Response, @Param('fileName') fileName: string) {
@@ -163,13 +162,8 @@ export class TicketsController {
     res.sendFile(path);
   }
 
-  @Get('files/:id')
-  @Auth(ROLES.SOPORTE, ROLES.ADMINISTRADOR)
-  async findAllFile(@Param('id', new ParseUUIDPipe()) id: string) {
-    return await this.ticketsService.getFiles(id);
-  }
 
-  //Logo
+  //LOGO
   @Post('logo')
   @Auth(ROLES.ADMINISTRADOR)
   @UseInterceptors(
@@ -189,7 +183,6 @@ export class TicketsController {
   
       const secureUrl = `${this.configService.get('HOST_API')}/tickets/logo/${file.filename}`;
       return {ok: true};
-    
   }
 
   @Get('logo/:fileName')

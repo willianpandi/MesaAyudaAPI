@@ -45,7 +45,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
         // },
       },
       defaults: {
-        from: '"Mesa de Ayuda" <noreply@example.com>',
+        from: '"Mesa de Ayuda" <soporte.tics@mspz3.gob.ec>',
       },
     }),
   ],

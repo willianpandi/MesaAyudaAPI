@@ -1,11 +1,19 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as morgan from "morgan";
+// import * as morgan from "morgan";
 import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common';
 import { CORS } from './constants/cors';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+// import * as fs from 'fs';
+// import * as https from 'https';
 
 async function bootstrap() {
+  // PARA USO DE HTTPS
+  // const httpsOptions = {
+  //   key: fs.readFileSync('/etc/ssl/private/mspz3_gob_ec.key'), 
+  //   cert: fs.readFileSync('/etc/ssl/certs/mspz3_gob_ec.crt'), 
+  // };
+  // const app = await NestFactory.create(AppModule, {httpsOptions});
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
   // app.use(morgan('dev'));

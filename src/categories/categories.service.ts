@@ -9,7 +9,6 @@ import { Repository, UpdateResult } from 'typeorm';
 import { CategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { Category } from './entities/category.entity';
 import { SubCategory } from '../sub-category/entities/sub-category.entity';
-import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -29,7 +28,7 @@ export class CategoriesService {
         'Ya existe una categoria con el nombre ingresado',
       );
     }
-    return await this.categoryRepository.save(body);
+    return await this.categoryRepository.save({...body, createdAt: new Date(),updateAt: new Date()});
   }
 
   
@@ -48,9 +47,7 @@ export class CategoriesService {
 
   async findSubCategoriesByCategory(id: string): Promise<SubCategory[]> {
     const category: Category = await this.categoryRepository.findOne({
-      where: {
-        id,
-      },
+      where: {id},
       relations: ['subcategories']
     });
     if (!category) {
@@ -88,7 +85,7 @@ export class CategoriesService {
 
     const category: UpdateResult = await this.categoryRepository.update(
       id,
-      body
+      {...body, updateAt: new Date()}
     );
     if (category.affected === 0) {
       throw new BadRequestException('No se pudo actualizar la categoria');

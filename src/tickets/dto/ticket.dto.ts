@@ -1,9 +1,7 @@
 import { ESTADOS, OPORTUNO, SATISFACCION, S_PROBLEMA } from './../../constants/opcions';
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsBoolean, IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, } from "class-validator";
-import { Category } from '../../categories/entities/category.entity';
+import { IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, } from "class-validator";
 import { File } from '../entities/file.entity';
-
 
 export class TicketDto {
     @ApiProperty()
@@ -79,7 +77,7 @@ export class TicketDto {
     
     @ApiProperty()
     @IsOptional()
-    files?: File[];
+    file?: File;
 
     @ApiProperty()
     @IsOptional()

@@ -6,6 +6,9 @@ import { SubCategory } from "../../sub-category/entities/sub-category.entity";
 
 @Entity({name: 'categories'})
 export class Category extends BaseEntity {
+
+    @Column()
+    estado: boolean;
     
     @Column()
     nombre: string;
@@ -18,7 +21,7 @@ export class Category extends BaseEntity {
     @OneToMany(()=> Ticket, (tickets)=> tickets.category )
     tickets: Ticket[];
 
-    @OneToMany(()=> SubCategory, (subcategories)=> subcategories.category,  { cascade:true, eager: true, }  )
+    @OneToMany(()=> SubCategory, (subcategories)=> subcategories.category)
     subcategories: SubCategory[];
 
     @ManyToMany(() => User, (user) => user.categories )

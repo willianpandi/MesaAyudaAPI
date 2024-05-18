@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { SubCategoryService } from './sub-category.service';
 import { CreateSubCategoryDto, UpdateSubCategoryDto } from './dto/sub-category.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -17,6 +17,7 @@ export class SubCategoryController {
   }
 
   @Get('all')
+  @Auth(ROLES.ADMINISTRADOR)
   async findAll() {
     return this.subCategoryService.findAllSubCategories();
   }
@@ -40,9 +41,4 @@ export class SubCategoryController {
     return this.subCategoryService.updateSubCategory(id, body);
   }
 
-  @Delete('delete/:id')
-  @Auth(ROLES.ADMINISTRADOR)
-  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.subCategoryService.removeSubCategory(id);
-  }
 }

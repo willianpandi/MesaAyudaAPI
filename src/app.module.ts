@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-
 import { UsersModule } from './users/users.module';
 import { EstableishmentsModule } from './estableishments/estableishments.module';
 import { DistrictsModule } from './districts/districts.module';
@@ -15,14 +14,13 @@ import { SubCategoryModule } from './sub-category/sub-category.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      database: 'mesa_ayuda',
-      username: 'postgres',
-      password: '150820',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      database: process.env.DB_NAME,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -31,7 +29,8 @@ import { SubCategoryModule } from './sub-category/sub-category.module';
     DistrictsModule, 
     TicketsModule, 
     CategoriesModule, 
-    AuthModule, SubCategoryModule, 
+    AuthModule, 
+    SubCategoryModule, 
   ],
 })
 export class AppModule { }

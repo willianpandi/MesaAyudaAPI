@@ -32,7 +32,7 @@ export class SubCategoryService {
         'No existe la categoria ingresado',
       );
     }
-    return await this.subCategoryRepository.save({...body, category});
+    return await this.subCategoryRepository.save({...body, category, createdAt: new Date(),updateAt: new Date()});
   }
 
   async findAllSubCategories(): Promise<SubCategory[]> {
@@ -135,7 +135,7 @@ export class SubCategoryService {
       throw new NotFoundException('No existe la sub-categoria');
     }
 
-const category = await this.categoryService.findOneCategory(body.category)
+    const category = await this.categoryService.findOneCategory(body.category)
     if (!category) {
       throw new BadRequestException(
         'No existe la categoria ingresado',
@@ -143,8 +143,7 @@ const category = await this.categoryService.findOneCategory(body.category)
     }
     const subcategory: UpdateResult = await this.subCategoryRepository.update(
       id,
-      {...body,
-      category}
+      {...body, category, updateAt: new Date()}
     );
     if (subcategory.affected === 0) {
       throw new BadRequestException('No se pudo actualizar la sub-categoria');

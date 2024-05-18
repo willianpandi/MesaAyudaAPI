@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { EstableishmentsService } from './estableishments.service';
 import { EstableishmentDto, UpdateEstableishmentDto } from './dto/estableishment.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -50,12 +50,5 @@ export class EstableishmentsController {
   async update(@Param('id', new ParseUUIDPipe()) id: string, @Body() body: UpdateEstableishmentDto) {
     return await this.estableishmentsService.updateEstableishment(id, body);
   }
-
-  @Delete('delete/:id')
-  @Auth(ROLES.ADMINISTRADOR)
-  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return await this.estableishmentsService.removeEstableishment(id);
-  }
-
 
 }

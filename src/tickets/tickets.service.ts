@@ -45,7 +45,6 @@ export class TicketsService {
   ) {}
 
   async sendEmail(body: SendEmailDto, ticket: Ticket): Promise<void> {
-
     const fechaCreacion = new Date(ticket.createdAt);
     const fechaFormateada = fechaCreacion.toLocaleDateString('es-ES', {
       day: 'numeric',
@@ -60,19 +59,18 @@ export class TicketsService {
       <p>${body.mensaje}</p>
       <p>Información del ticket:</p>
       <ul>
+      <li><strong>Fecha de creación:</strong> ${fechaFormateada}</li>
       <li><strong>Nombre:</strong> ${ticket.nombre}</li>
       <li><strong>Tema de Ayuda:</strong> ${ticket.category.nombre}</li>
       <li><strong>Sub-Tema:</strong> ${ticket.subcategory.nombre}</li>
       <li><strong>Establecimiento:</strong> ${ticket.estableishment.nombre}</li>
-      // <li><strong>Soporte Asignado:</strong> ${ticket.soporteAsignado}</li>
+      <li><strong>Soporte Asignado:</strong> ${ticket.soporteAsignado}</li>
       <li><strong>Requerimiento / Problema / Pedido:</strong> ${ticket.requerimiento}</li>
-      <li><strong>Fecha de creación:</strong> ${fechaFormateada}</li>
       </ul><br><br>
       <p>Gestión Zonal de Tecnologías de la Información y Comunicaciones</p>
       <p>Coordinación Zonal 3 - Salud</p>
       `;
       
-
     await this.mailerService.sendMail({
       to: body.destinatario,
       subject: body.asunto,
@@ -85,6 +83,7 @@ export class TicketsService {
     body: TicketDto,
     file: Express.Multer.File,
   ): Promise<Ticket> {
+
     const category = await this.categoriesService.findOneCategory(
       body.category,
     );
@@ -116,26 +115,33 @@ export class TicketsService {
       throw new NotFoundException('No existe un usuario soporte a quien se pueda asignar el ticket');
     }
 
-    
+    let savedFile: File | undefined;
+    if (file) {
+      savedFile = await this.createFile(file);      
+    }
+
+
+
     const newTicket = this.ticketRepository.create({
       ...body,
       category,
       subcategory,
       estableishment,
+      estado: ESTADOS.ABIERTO,
       soporteAsignado: user.nombre,
+      file: savedFile,
+      createdAt: new Date(),
+      updateAt: new Date(),
     });
+
     const savedTicket = await this.ticketRepository.save(newTicket);
-
-    if (file) {
-      await this.createFile(file, newTicket.id);
-    }
-
-    // await this.sendEmail({
-    //   destinatario: [savedTicket.correo_electronico, user.correo_institucional],
-    //   asunto: `Nuevo Ticket Asignado: ${savedTicket.codigo}`,
-    //   mensaje: `Detalles del <strong>Ticket ${savedTicket.codigo}</strong>.`,
-    // }, savedTicket);
-
+    
+    await this.sendEmail({
+        destinatario: [savedTicket.correo_electronico, user.correo_institucional],
+        asunto: `Nuevo Ticket Creado: ${savedTicket.codigo}`,
+        mensaje: `Detalles del <strong>Ticket ${savedTicket.codigo}</strong>.`,
+      }, savedTicket);
+      
     return savedTicket;
   }
 
@@ -177,18 +183,20 @@ export class TicketsService {
       category: categoryFound,
       subcategory: subcategoryFound,
       estableishment: estableishmentFound,
+      createdAt: new Date(),
+      updateAt: new Date(),
     });
     const savedTicket = await this.ticketRepository.save(newTicket);
 
     const { id, category, subcategory, estableishment, estado, ...bodyTicket } = savedTicket;
+
+    await this.sendEmail({
+      destinatario: [savedTicket.correo_electronico, user.correo_institucional],
+      asunto: `Nuevo Ticket Creado: ${savedTicket.codigo}`,
+      mensaje: `Detalles del <strong>Ticket ${savedTicket.codigo}</strong>.`,
+    }, savedTicket);
     
     const ticketClose = await this.updateCloseTicket(id, {estado: ESTADOS.CERRADO, ...bodyTicket} )
-
-    // await this.sendEmail({
-    //   destinatario: [savedTicket.correo_electronico, user.correo_institucional],
-    //   asunto: `Nuevo Ticket Asignado: ${savedTicket.codigo}`,
-    //   mensaje: `Detalles del <strong>Ticket ${savedTicket.codigo}</strong>.`,
-    // }, savedTicket);
 
     return ticketClose;
   }
@@ -200,7 +208,8 @@ export class TicketsService {
     let query = this.ticketRepository.createQueryBuilder('ticket')
       .leftJoinAndSelect('ticket.category', 'category')
       .leftJoinAndSelect('ticket.subcategory', 'subcategory')
-      .leftJoinAndSelect('ticket.estableishment', 'estableishment');
+      .leftJoinAndSelect('ticket.estableishment', 'estableishment')
+      .leftJoinAndSelect('ticket.file', 'file');
 
     if (inicio && fin) {
       const fechaInicio = new Date(inicio);
@@ -209,6 +218,8 @@ export class TicketsService {
 
       query = query.where('ticket.createdAt BETWEEN :inicio AND :fin', { inicio: fechaInicio, fin: fechaFin });
     }
+
+    query = query.orderBy('ticket.codigo', 'DESC');
 
     const tickets: Ticket[] = await query.getMany();
 
@@ -220,21 +231,18 @@ export class TicketsService {
   }
  
   async findTickets(cedula: string): Promise<any[]> {  
-    const tickets: Ticket[] = await this.ticketRepository.find({where: {cedula}})
+    const tickets: Ticket[] = await this.ticketRepository.find({where: {cedula}, order: { codigo: 'DESC' }})
     if (tickets.length === 0) {
       throw new NotFoundException('No se encontro datos de tickets');
     }
-    const userTickets = tickets.map(ticket => {
-      const link = ticket.estado === ESTADOS.CERRADO
-        ? `${this.configService.get('HOST_FRONT')}/${ticket.id}`
-        : null;
-  
+    const userTickets = tickets.map(ticket => {  
       return {
+        id: ticket.id,
         codigo: ticket.codigo,
         estado: ticket.estado,
         soporteAsignado: ticket.soporteAsignado,
         soporteReasignado: ticket.soporteReasignado,
-        link: link,
+        satisfaccion: ticket.satisfaccion,
       };
     });
 
@@ -343,7 +351,8 @@ export class TicketsService {
 
     const tickets: Ticket[] = await this.ticketRepository.find({
        where: {soporteReasignado:userr.nombre},
-       relations: ['category', 'subcategory', 'estableishment']
+       order: { codigo: 'DESC' },
+       relations: ['category', 'subcategory', 'estableishment', 'file']
     })
     if (tickets.length === 0) {
       throw new NotFoundException('No se encontro datos de tickets');
@@ -362,7 +371,7 @@ export class TicketsService {
   async findOneTicket(id: string): Promise<Ticket> {
     const ticket: Ticket = await this.ticketRepository.findOne({
       where: {id},
-      relations: ['category', 'subcategory', 'estableishment'],
+      relations: ['category', 'subcategory', 'estableishment', 'file'],
     });
     if (!ticket) {
       throw new NotFoundException('El ticket no fue encontrado');
@@ -395,7 +404,7 @@ export class TicketsService {
     
     const { category, subcategory, estableishment, ...updatedData } = body;
 
-    const ticket: UpdateResult = await this.ticketRepository.update(id, updatedData);
+    const ticket: UpdateResult = await this.ticketRepository.update(id, {...updatedData, updateAt: new Date()});
     if (ticket.affected === 0) {
       throw new BadRequestException('No se pudo actualizar el ticket');
     }
@@ -414,7 +423,7 @@ export class TicketsService {
       throw new NotFoundException('No existe el ticket o el Departamento de Ayuda');
     }
     
-    const ticketupdate: UpdateResult = await this.ticketRepository.update(id, {subcategory});
+    const ticketupdate: UpdateResult = await this.ticketRepository.update(id, {subcategory, updateAt: new Date()});
     if (ticketupdate.affected === 0) {
       throw new BadRequestException('No se pudo actualizar el Departamento del ticket');
     }
@@ -426,31 +435,50 @@ export class TicketsService {
     if (!ticketFound) {
       throw new NotFoundException('No existe el ticket');
     }
+
     const fechaActual = new Date();
 
     const createdAt = new Date(ticketFound.createdAt);
+    const resigAt = new Date(ticketFound.reasignadoAt);
 
-    const tiempoOcupado = Math.floor((fechaActual.getTime() - createdAt.getTime()) / (1000 * 60));
+    // const tiempoOcupado = Math.floor((fechaActual.getTime() - createdAt.getTime()) / (1000 * 60));
+    const tiempoOcupado = this.calculartiempo(createdAt, fechaActual);
+
 
     let tiempoReasignado: number;
     if (ticketFound.reasignadoAt) {
-      tiempoReasignado = Math.floor((fechaActual.getTime() - ticketFound.reasignadoAt.getTime()) / (1000 * 60));
+      // tiempoReasignado = Math.floor((fechaActual.getTime() - ticketFound.reasignadoAt.getTime()) / (1000 * 60));
+      tiempoReasignado = this.calculartiempo(resigAt, fechaActual);
     }
-        
+
+          
     const { category, subcategory, estableishment,  ...updatedData } = body;
 
-    const ticket: UpdateResult = await this.ticketRepository.update(id, {...updatedData, tiempoOcupado, tiempoReasignado, cierreAt: fechaActual});
+    const ticket: UpdateResult = await this.ticketRepository.update(id, {
+      ...updatedData, 
+      tiempoOcupado, 
+      tiempoReasignado, 
+      cierreAt: fechaActual, 
+      updateAt: fechaActual
+    });
     if (ticket.affected === 0) {
       throw new BadRequestException('No se pudo actualizar el estado del ticket a CERRADO');
     }
 
-    // await this.sendEmail({
-    //   destinatario: [ticketFound.correo_electronico],
-    //   asunto: `Ticket Cerrado: ${ticketFound.codigo}`,
-    //   mensaje: `El <strong>Ticket ${ticketFound.codigo} </strong>, ha sido CERRADO. <br> Por favor realice el siguiente formulario de satisfacción: ${this.configService.get('HOST_FRONT')}/${ticketFound.id}`,
-    // }, ticketFound);
+    await this.sendEmail({
+      destinatario: [ticketFound.correo_electronico],
+      asunto: `Ticket Cerrado: ${ticketFound.codigo}`,
+      mensaje: `El <strong>Ticket ${ticketFound.codigo} </strong>, ha sido CERRADO. <br> Por favor realice el siguiente formulario de satisfacción: ${this.configService.get('HOST_FRONT')}/${ticketFound.id}`,
+    }, ticketFound);
 
     return ticket;
+  }
+
+
+  calculartiempo (startDate: Date, endDate: Date): number {
+
+    return Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60));
+
   }
   
   async updateReasigTicket(id: string, body: UpdateTicketDto): Promise<UpdateResult> {
@@ -462,10 +490,22 @@ export class TicketsService {
     const fechaActual = new Date();
 
     const { soporteReasignado } = body;
-    const ticket: UpdateResult = await this.ticketRepository.update(id, {soporteReasignado, reasignadoAt: fechaActual });
+
+    const user = await this.usersService.findUserByName(soporteReasignado);
+    if (!user) {
+      throw new NotFoundException('No existe un usuario soporte a quien reasignar el ticket');
+    }
+
+    const ticket: UpdateResult = await this.ticketRepository.update(id, {soporteReasignado, reasignadoAt: fechaActual, updateAt: new Date()});
     if (ticket.affected === 0) {
       throw new BadRequestException('No se pudo reasignar el ticket');
     }
+
+    await this.sendEmail({
+      destinatario: [ticketFound.correo_electronico, user.correo_institucional],
+      asunto: `Ticket Reasignado: ${ticketFound.codigo}`,
+      mensaje: `El <strong>Ticket ${ticketFound.codigo} </strong>, ha sido <strong>REASIGNADO</strong>.<br><strong>Soporte Reasignado:</strong> ${user.nombre}`,
+    }, ticketFound);
 
     return ticket;
   }
@@ -483,11 +523,10 @@ export class TicketsService {
   //SERVICIOS DE SUBIR ARCHIVOS
   async createFile(
     file: Express.Multer.File,
-    id_ticket: string,
   ): Promise<File> {
     if (!file) {
       throw new BadRequestException(
-        'Asegurate de que el archivo sea una imagen',
+        'Asegurate de subir un archivo',
       );
     }
 
@@ -495,15 +534,10 @@ export class TicketsService {
       file.filename
     }`;
 
-    const ticket = await this.findOneTicket(id_ticket);
-
-    if (!ticket) {
-      throw new BadRequestException('No existe el ticket');
-    }
-
     const savedFile = await this.fileRepository.save({
       archivo: secureUrl,
-      ticket,
+      createdAt: new Date(),
+      updateAt: new Date()
     });
 
     return savedFile;
@@ -518,14 +552,4 @@ export class TicketsService {
     return path;
   }
 
-  async getFiles(id: string) {
-    const ticketFound = await this.findOneTicket(id);
-    if (!ticketFound) {
-      throw new BadRequestException('No existe el ticket');
-    }
-    const files: File[] = await this.fileRepository.find({
-      where: { ticket: { id } },
-    });
-    return files;
-  }
 }

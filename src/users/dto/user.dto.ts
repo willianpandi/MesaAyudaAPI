@@ -4,87 +4,87 @@ import { ROLES } from "../../constants/opcions";
 
 
 export class UserDto {
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    usuario: string;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsBoolean()
+   estado: boolean;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    contrasenia: string;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   usuario: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsEnum(ROLES)
-    rol: ROLES;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   contrasenia: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsBoolean()
-    estado: boolean;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsEnum(ROLES)
+   rol: ROLES;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    nombre: string;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   nombre: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    puesto: string;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   puesto: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsDate()
-    f_ingreso: Date;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsDate()
+   f_ingreso: Date;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    g_Ocupacional: string;
-    
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    m_contrato: string;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   g_Ocupacional: string;
+   
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   m_contrato: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    celular: string;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   celular: string;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    telefono: string;
+   @ApiProperty()
+   @IsOptional()
+   @IsString()
+   telefono: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    @IsEmail()
-    correo_institucional: string;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   @IsEmail()
+   correo_institucional: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    @IsEmail()
-    correo_personal: string;
+   @ApiProperty()
+   @IsNotEmpty()
+   @IsString()
+   @IsEmail()
+   correo_personal: string;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    c_Administrativo: string;
-    
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    funciones_A: string;
-    
-    @ApiProperty()
-    @IsOptional()
-    @IsString()
-    observaciones: string;
+   @ApiProperty()
+   @IsOptional()
+   @IsString()
+   c_Administrativo: string;
+   
+   @ApiProperty()
+   @IsOptional()
+   @IsString()
+   funciones_A: string;
+   
+   @ApiProperty()
+   @IsOptional()
+   @IsString()
+   observaciones: string;
 
 }
 

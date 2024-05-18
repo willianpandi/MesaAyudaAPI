@@ -10,8 +10,8 @@ import { DistrictsService } from '../districts/districts.service';
 import { District } from '../districts/entities/district.entity';
 import { CategoriesService } from '../categories/categories.service';
 import { Category } from '../categories/entities/category.entity';
-import { SubCategoryService } from 'src/sub-category/sub-category.service';
-import { SubCategory } from 'src/sub-category/entities/sub-category.entity';
+import { SubCategoryService } from '../sub-category/sub-category.service';
+import { SubCategory } from '../sub-category/entities/sub-category.entity';
 
 
 @Module({

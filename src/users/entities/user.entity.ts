@@ -14,6 +14,14 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
+
+  @ApiProperty({
+    example: 'true',
+    description: 'Estado de la cuenta',
+  })
+  @Column()
+  estado: boolean;
+  
   @ApiProperty({
     example: '1808888888',
     description: 'Usuario / # de cedula',
@@ -35,14 +43,6 @@ export class User extends BaseEntity {
   })
   @Column({ type: 'enum', enum: ROLES })
   rol: ROLES;
-
-  @ApiProperty({
-    example: 'true',
-    description: 'Estado de la cuenta',
-    default: true,
-  })
-  @Column({ default: true })
-  estado: boolean;
 
   @ApiProperty({
     example: 'Willian Pandi',
@@ -130,22 +130,18 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   observaciones: string;
 
-
-  // @OneToMany(() => Category, (categories) => categories.user, {onDelete: 'CASCADE'})
-  // categories: Category[];
-
   @ApiProperty({
     example: '["Datos de Establecimiento"]',
     description: 'Establecimientos a los que pertenece el usuario',
   })
-  @ManyToMany( () => Estableishment, (estableishment) => estableishment.users,  { cascade:true, eager: true, } )
+  @ManyToMany( () => Estableishment, (estableishment) => estableishment.users)
   estableishments: Estableishment[];
   
   @ApiProperty({
     example: '["Datos de Temas de Ayuda"]',
     description: 'Establecimientos a los que pertenece el usuario',
   })
-  @ManyToMany(() => Category, (categories) => categories.users, {cascade:true, eager: true,})
+  @ManyToMany(() => Category, (categories) => categories.users)
   categories: Category[];
 
 }

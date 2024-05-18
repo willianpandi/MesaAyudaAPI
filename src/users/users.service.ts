@@ -50,6 +50,8 @@ export class UsersService {
     const newUser = this.userRepository.create({
       contrasenia: bcryptjs.hashSync(contrasenia, 10),
       ...userDta,
+      createdAt: new Date(),
+      updateAt: new Date(),
     });
 
     return await this.userRepository.save(newUser);
@@ -75,7 +77,7 @@ export class UsersService {
     return users;
   }
 
-  async findTicketsByUser(id: string) {
+  async findTicketsByUser(id: string, order: 'ASC' | 'DESC' = 'DESC') {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: [
@@ -84,6 +86,7 @@ export class UsersService {
         'categories.tickets.category',
         'categories.tickets.subcategory',
         'categories.tickets.estableishment',
+        'categories.tickets.file',
       ],
     });
 
@@ -92,6 +95,13 @@ export class UsersService {
         (ticket) => (!ticket.soporteReasignado || ticket.soporteReasignado === '')&&(ticket.soporteAsignado === user.nombre),
       ),
     );
+    filteredTickets.sort((a, b) => {
+      if (order === 'ASC') {
+          return a.codigo - b.codigo;
+      } else {
+          return b.codigo - a.codigo;
+      }
+    });
     return filteredTickets;
   }
 
@@ -209,6 +219,7 @@ export class UsersService {
       .innerJoin('users.categories', 'category')
       .where('estableishment.id = :estabId', { estabId: estableishment.id })
       .andWhere('category.id = :categId', { categId: category.id })
+      .andWhere('users.estado = :userEstado', { userEstado: true }) 
       .getMany();
 
       return users.length > 0 ? users[Math.floor(Math.random() * users.length)] : null;
@@ -255,7 +266,7 @@ export class UsersService {
     }
 
     if (userr.rol === ROLES.ADMINISTRADOR) {
-      const user: UpdateResult = await this.userRepository.update(id, body);
+      const user: UpdateResult = await this.userRepository.update(id, {...body, updateAt: new Date()});
       if (user.affected === 0) {
         throw new BadRequestException('No se pudo actualizar el usuario');
       }
@@ -267,7 +278,7 @@ export class UsersService {
       );
     }
 
-    const user: UpdateResult = await this.userRepository.update(id, body);
+    const user: UpdateResult = await this.userRepository.update(id, {...body, updateAt: new Date()});
     if (user.affected === 0) {
       throw new BadRequestException('No se pudo actualizar el usuario');
     }
@@ -290,6 +301,7 @@ export class UsersService {
 
     const user: UpdateResult = await this.userRepository.update(userr.id, {
       contrasenia: hashedPassword,
+      updateAt: new Date(),
     });
     if (user.affected === 0) {
       throw new BadRequestException('No se pudo actualizar el usuario');
@@ -455,14 +467,11 @@ export class UsersService {
     return user.categories;
   }
 
-
-
   async removeUser(id: string) {
     const user = await this.findOneUser(id);
     if (!user) {
       throw new BadRequestException('No existe el usuario');
     }
     return await this.userRepository.remove(user);
-    
   }
 }

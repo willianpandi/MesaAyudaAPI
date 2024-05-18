@@ -1,12 +1,18 @@
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class EstableishmentDto {
+    
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsBoolean()
+    estado: boolean;
+    
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
     codigo: string;
-
+    
     @ApiProperty()
     @IsNotEmpty()
     @IsString()

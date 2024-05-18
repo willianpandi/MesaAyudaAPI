@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   ParseUUIDPipe,
   Put,
   Query,
@@ -61,36 +60,37 @@ export class UsersController {
     return await this.usersService.findCategoriesByUser(user.id);
   }
 
-  //CONTADOR
   @Get('count')
   async getCount() {
     return await this.usersService.Count();
   }
 
   @Get('supports')
-  // @Auth(ROLES.ADMINISTRADOR)
+  @Auth(ROLES.ADMINISTRADOR)
   async findSupports() {
     const supports = await this.usersService.findAllUsersSupports();
     const actiSupports = supports.filter(support => support.estado === true);
     return actiSupports;
   }
-
-  @Get('tickets')
-  @Auth(ROLES.SOPORTE)
-  async findTickets(
-    @GetUser() user: User,
-  ) {
-    return await this.usersService.findTicketsByUser(user.id);
-  }
-
+  
   @Get('newtickets')
   @Auth(ROLES.SOPORTE)
   async findNewTickets(
     @GetUser() user: User,
   ) {
-    const tickets = await this.usersService.findTicketsByUser(user.id)
+    const tickets = await this.usersService.findTicketsByUser(user.id, 'DESC')
     const newTickets = tickets.filter(ticket => ticket.estado === ESTADOS.ABIERTO || ticket.estado === ESTADOS.EN_PROCESO);
     return newTickets;
+  }
+  
+  @Get('closetickets')
+  @Auth(ROLES.SOPORTE)
+  async findCloseTickets(
+    @GetUser() user: User,
+  ) {
+    const tickets = await this.usersService.findTicketsByUser(user.id, 'DESC')
+    const closetickets = tickets.filter(ticket => ticket.estado === ESTADOS.CERRADO);
+    return closetickets;
   }
 
   @Get('reports')
@@ -178,12 +178,4 @@ export class UsersController {
     );
   }
 
-  @Delete('delete/:id')
-  @Auth(ROLES.ADMINISTRADOR)
-  async remove(
-    @GetUser() user: User,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
-    return await this.usersService.removeUser(id);
-  }
 }

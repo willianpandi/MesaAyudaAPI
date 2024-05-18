@@ -1,4 +1,4 @@
-import { Ticket } from "src/tickets/entities/ticket.entity";
+import { Ticket } from "../../tickets/entities/ticket.entity";
 import { BaseEntity } from "../../config/base.entity";
 import { District } from "../../districts/entities/district.entity";
 import { User } from "../../users/entities/user.entity";
@@ -6,6 +6,10 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 
 @Entity({name: 'estableishments'})
 export class Estableishment extends BaseEntity {
+    
+    @Column()
+    estado: boolean;
+
     @Column()
     codigo: string;
 
@@ -14,7 +18,7 @@ export class Estableishment extends BaseEntity {
 
     // RELACIONES
 
-    @ManyToOne(()=> District, (district)=> district.estableishments, {onDelete: 'CASCADE'})
+    @ManyToOne(()=> District, (district)=> district.estableishments)
     @JoinColumn({name: 'id_district'})
     district: District;
 

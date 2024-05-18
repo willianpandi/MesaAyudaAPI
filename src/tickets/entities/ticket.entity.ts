@@ -1,10 +1,10 @@
-import { Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { BaseEntity } from "../../config/base.entity";
 import { ESTADOS, OPORTUNO, SATISFACCION, S_PROBLEMA } from "../../constants/opcions";
 import { Category } from "../../categories/entities/category.entity";
 import { File } from "./file.entity";
-import { SubCategory } from "src/sub-category/entities/sub-category.entity";
-import { Estableishment } from "src/estableishments/entities/estableishment.entity";
+import { SubCategory } from "../../sub-category/entities/sub-category.entity";
+import { Estableishment } from "../../estableishments/entities/estableishment.entity";
 
 
 
@@ -44,7 +44,7 @@ export class Ticket extends BaseEntity {
     @Column({ nullable: true })
     n_consultorio: string;
 
-    @Column({type: 'enum', enum: ESTADOS, default: ESTADOS.ABIERTO})
+    @Column({type: 'enum', enum: ESTADOS})
     estado: ESTADOS;
 
     @Column({ type: 'enum', enum: SATISFACCION, nullable: true })
@@ -98,7 +98,8 @@ export class Ticket extends BaseEntity {
     @JoinColumn({name: 'id_category'})
     category: Category;
 
-    @OneToMany(()=> File, (files) => files.ticket, { cascade:true, eager: true, } )
-    files?: File[];
+    @OneToOne(()=> File, {nullable: true})
+    @JoinColumn({name: 'id_file'})
+    file?: File;
 
 }

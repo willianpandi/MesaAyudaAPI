@@ -5,9 +5,13 @@ import { Column, Entity, OneToMany } from "typeorm";
 
 @Entity({name: 'districts'})
 export class District extends BaseEntity {
+    
+    @Column()
+    estado: boolean;
+    
     @Column()
     codigo: string;
-    
+
     @Column()
     nombre: string;
     
@@ -15,6 +19,6 @@ export class District extends BaseEntity {
     provincia: PROVINCIAS;
 
     // RELACIONES
-    @OneToMany(()=> Estableishment, (estableishments)=> estableishments.district,  { cascade:true, eager: true, } )
+    @OneToMany(()=> Estableishment, (estableishments)=> estableishments.district)
     estableishments: Estableishment[];
 }

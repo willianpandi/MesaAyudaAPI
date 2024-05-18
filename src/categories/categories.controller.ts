@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -18,7 +18,15 @@ export class CategoryController {
     return this.categoriesService.createCategory(body);
   }
 
+  @Get('all-active')
+  async findAllActive() {
+    const categories = await this.categoriesService.findAllCategories();
+    const activeCategories = categories.filter(category => category.estado === true);
+    return activeCategories;
+  }
+  
   @Get('all')
+  @Auth(ROLES.ADMINISTRADOR)
   async findAll() {
     return this.categoriesService.findAllCategories();
   }
@@ -30,7 +38,9 @@ export class CategoryController {
 
   @Get('sub-category/:id')
   async findSubCategories(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.categoriesService.findSubCategoriesByCategory(id);
+    const subCategories = await this.categoriesService.findSubCategoriesByCategory(id);
+    const activeSubCategories = subCategories.filter(subCategory => subCategory.estado === true);
+    return activeSubCategories;
   }
 
   @Get(':id')
@@ -46,9 +56,4 @@ export class CategoryController {
     return this.categoriesService.updateCategory(id, body);
   }
 
-  @Delete('delete/:id')
-  @Auth(ROLES.ADMINISTRADOR)
-  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.categoriesService.removeCategory(id);
-  }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Auth } from '../auth/decorators/auth.decorator';
@@ -17,8 +17,15 @@ export class DistrictsController {
     return await this.districtsService.createDistrict(body);
   }
 
+  @Get('all-active')
+  async findAllActive() {
+    const districts = await this.districtsService.findAllDistricts();
+    const activeDistricts = districts.filter(district => district.estado === true);
+    return activeDistricts;
+  }
+
   @Get('all')
-  // @Auth(ROLES.ADMINISTRADOR)
+  @Auth(ROLES.ADMINISTRADOR)
   async findAll() {
     return await this.districtsService.findAllDistricts();
   }
@@ -37,7 +44,9 @@ export class DistrictsController {
   @Get('estableishments/:id')
   // @Auth(ROLES.ADMINISTRADOR)
   async findAllByDistrict(@Param('id', new ParseUUIDPipe()) id: string) {
-    return await this.districtsService.findEstableishmentByDistrict(id);
+    const estableishments = await this.districtsService.findEstableishmentByDistrict(id);
+    const activeEstableishments = estableishments.filter(estableishment => estableishment.estado === true);
+    return activeEstableishments;
   }
 
   @Get('reports/:id')
@@ -52,10 +61,5 @@ export class DistrictsController {
   async update(@Param('id', new ParseUUIDPipe()) id: string, @Body() body: UpdateDistrictDto) {
     return await this.districtsService.updateDistrict(id, body);
   }
-
-  @Delete('delete/:id')
-  @Auth(ROLES.ADMINISTRADOR)
-  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return await this.districtsService.removeDistrict(id);
-  }
+  
 }

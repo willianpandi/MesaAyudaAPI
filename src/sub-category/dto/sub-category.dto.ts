@@ -1,7 +1,13 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateSubCategoryDto {
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsBoolean()
+  estado: boolean;
+  
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
